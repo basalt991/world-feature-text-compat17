@@ -85,6 +85,8 @@ class Probe
         Check((int)register.Invoke(host, new object[] { "probe/latin", latinData, 48f, 1 }) == 0, "baseline Latin font registration");
         byte[] koreanData = File.ReadAllBytes(@"C:\Windows\Fonts\malgun.ttf");
         char[] hangul = Enumerable.Range(0xAC00, 11172).Select(c => (char)c).ToArray();
+        byte[] bundledFont = File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "Fonts", "Pretendard.ttf"));
+        Check(PlatformFonts.SelectFace(bundledFont, hangul) == 0, "bundled Pretendard covers all 11172 Hangul syllables");
         Check(PlatformFonts.SelectFace(koreanData, hangul) == 0, "Windows default covers all 11172 Hangul syllables");
         var macPaths = PlatformFonts.CandidatePaths(true, "unused-Windows-path");
         Check(macPaths[0] == "/System/Library/Fonts/AppleSDGothicNeo.ttc" && macPaths.All(p => p.StartsWith("/")), "Mac candidates use engine-confirmed macOS paths");
@@ -161,6 +163,7 @@ class Probe
         var labels = (IList)textsField.GetValue(null);
         Check(labels.Count == names.Length, "native creator completes with one label per Korean feature");
         Check(ReferenceEquals(prefabText.font, originalFont), "shared prefab restored after creation");
+        Check(((TextMeshPro)meshField.GetValue(labels[0])).font.name == "WorldFeatureTextCompat17/Pretendard", "production world label uses bundled Pretendard");
         for (int i = 0; i < labels.Count; i++)
         {
             Check(labels[i] is WorldFeatureTextMesh_TextMeshPro, "Korean feature uses native TMP " + i);

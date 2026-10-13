@@ -1,5 +1,6 @@
 PASS: real FreeType rasterizer
 PASS: baseline Latin font registration
+PASS: bundled Pretendard covers all 11172 Hangul syllables
 PASS: Windows default covers all 11172 Hangul syllables
 PASS: Mac candidates use engine-confirmed macOS paths
 PASS: Windows candidate remains Malgun Gothic
@@ -17,6 +18,7 @@ PASS: unpatched world font excludes Hangul
 PASS: Harmony patches actual world creator
 PASS: native creator completes with one label per Korean feature
 PASS: shared prefab restored after creation
+PASS: production world label uses bundled Pretendard
 PASS: Korean feature uses native TMP 0
 PASS: asset factory creates independent label 0
 Mesh 0: font=3, visible=4/4
@@ -56,4 +58,4 @@ PASS: unrelated creation exception propagates without suppression
 PASS: Harmony finalizer restores prefab after actual exception
 PASS: English retains original world font
 PASS: Korean to English world recreation removes obsolete labels
-PASS: 54 checks; runtime 10.0.10
+PASS: 56 checks; runtime 10.0.10

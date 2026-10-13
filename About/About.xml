@@ -6,5 +6,5 @@
   <supportedVersions><li>1.7</li></supportedVersions>
   <modDependencies><li><packageId>brrainz.harmony</packageId><displayName>Harmony</displayName><steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl></li></modDependencies>
   <loadAfter><li>brrainz.harmony</li></loadAfter>
-  <description>Windows / RimWorld 1.7.4976. Fixes Korean world feature names entering the broken legacy TextMesh path. Prepares the syllables used by world names with the bundled Fonts/Pretendard.ttf font and uses the native TextMeshPro renderer. Keeps world names, positions, wrapping, visibility and language. Pretendard and its license are included; game assemblies are not bundled. Readable Fonts 1.7 is optional.</description>
+  <description>RimWorld 1.7.4976. Fixes Korean world feature names entering the broken legacy TextMesh path. Prepares the syllables used by world names with the bundled Fonts/Pretendard.ttf font and uses the native TextMeshPro renderer. Keeps world names, positions, wrapping, visibility and language. Pretendard and its license are included; game and Harmony assemblies are not bundled. Readable Fonts 1.7 is optional. Windows isolated engine checks passed; actual macOS execution remains unverified.</description>
 </ModMetaData>

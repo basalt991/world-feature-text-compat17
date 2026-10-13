@@ -1,5 +1,5 @@
 {
-  "release": "v0.2.0",
+  "release": "v0.2.1",
   "game_version": "1.7.4976 rev1043",
   "runtime_test_platform": "Windows",
   "platforms_implemented": [
@@ -7,12 +7,12 @@
     "macOS"
   ],
   "build_errors": 0,
-  "build_warnings": 2,
+  "build_warnings": 0,
   "ca1416_suppressed": "Windows reference assemblies mark portable BCL calls Windows-only",
   "xml_valid": true,
   "managed_dll": "AnyCPU / ILOnly; no PInvoke",
   "engine_runtime": "10.0.10 bundled Waylith CLR",
-  "runtime_checks_passed": 54,
+  "runtime_checks_passed": 56,
   "mac_font_paths_simulated": true,
   "actual_apple_fonts_tested": false,
   "mac_runtime_verified": false,
@@ -24,7 +24,11 @@
   "engine_dll_sha256": "7183C5B884BF22DFE9EFA10E596FFAC862EEB3C71678B544C357ED69F50030A3",
   "unitystubs_sha256": "B0B997C300670D5A42EA70F468FF9FEDABA03CBD65EABF5D522675B3F16CDB22",
   "font": "Fonts/Pretendard.ttf",
-  "harmony_compile_reference": "Lib.Harmony.Ref 3.0.0-rc.2",
+  "harmony_compile_reference": "Installed Harmony 1.7 / 0Harmony 3.0.0.0",
   "harmony_runtime": "0Harmony 3.0.0.0 (installed mod)",
-  "build_warning": "NU1900: NuGet vulnerability data endpoint unavailable on final build"
+  "source_merge_commit": "97a93b521196a10e1f4c1cd7cf1143a330580869",
+  "bundled_font_sha256": "6D0AF5258997AEC7354A6E340FC2325BA321C410CA48B3AF858C8C3D6E92A324",
+  "font_license_sha256": "FB503EBD5FBE8E725380A16201D4F74111756DFE048CA0358CDBED1DA86A9892",
+  "bundled_font_hangul_syllables_checked": 11172,
+  "production_font": "bundled Pretendard; no OS font lookup"
 }
