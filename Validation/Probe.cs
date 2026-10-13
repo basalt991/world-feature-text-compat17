@@ -194,11 +194,14 @@ class Probe
         Check(rebuilt.mesh.vertices.Length == 5 * 4, "newly added syllables generate real geometry after atlas growth");
         var throwMethod = AccessTools.Method(typeof(Probe), nameof(ThrowAfterPreparation));
         harmony.Patch(creator, postfix: new HarmonyMethod(throwMethod));
+        world.textsCreated = true;
         bool propagated = false;
         try { creator.Invoke(world, null); }
         catch (TargetInvocationException e) { propagated = e.InnerException is InvalidOperationException; }
         Check(propagated, "unrelated creation exception propagates without suppression");
         Check(ReferenceEquals(prefabText.font, originalFont), "Harmony finalizer restores prefab after actual exception");
+        Check(!world.textsCreated, "real creation failure resets textsCreated");
+        Check(((IList)textsField.GetValue(null)).Count == 0, "real creation failure clears partial text list");
         harmony.Unpatch(creator, throwMethod);
         AccessTools.Field(typeof(LanguageDatabase), "activeLanguage").SetValue(null, LanguageDatabase.defaultLanguage);
         world.features = new List<WorldFeature> { new WorldFeature { name = "Blue Mountains" } };
@@ -206,6 +209,50 @@ class Probe
         labels = (IList)textsField.GetValue(null);
         Check(ReferenceEquals(((TextMeshPro)meshField.GetValue(labels[0])).font, originalFont), "English retains original world font");
         Check(labels.Count == 1, "Korean to English world recreation removes obsolete labels");
+        AccessTools.Field(typeof(LanguageDatabase), "activeLanguage").SetValue(null, RuntimeHelpers.GetUninitializedObject(typeof(LoadedLanguage)));
+        char missingGlyph = '\u26F0';
+        Check(PlatformFonts.SelectFace(bundledFont, new[] { missingGlyph }) < 0, "regression fixture is absent from Pretendard");
+        string originalName = "한글" + missingGlyph;
+        world.features = new List<WorldFeature> { new WorldFeature { name = "푸른 산맥" }, new WorldFeature { name = originalName } };
+        creator.Invoke(world, null);
+        labels = (IList)textsField.GetValue(null);
+        Check(labels.Count == 2, "missing glyph no longer aborts other world names");
+        var missingLabel = (WorldFeatureTextMesh_TextMeshPro)labels[1];
+        // The native positioner sets Text after CreateOrDestroyTexts has restored the
+        // shared prefab. Verify sanitization is scoped to the cloned label's font.
+        missingLabel.Text = originalName;
+        Check(missingLabel.Text == "한글?", "missing glyph replaced only in rendered name");
+        Check(world.features[1].name == originalName, "original world feature name preserved");
+        var missingMesh = (TextMeshPro)meshField.GetValue(missingLabel);
+        missingMesh.fontSize = 20f; missingMesh.color = Color.white; missingMesh.ForceMeshUpdate();
+        Check(missingMesh.mesh.vertices.Length == 12, "replacement glyph generates real visible geometry");
+        missingLabel.Text = "한글\U0001F600\n?";
+        Check(missingLabel.Text == "한글?\n?", "supplementary scalar replaced once and newline preserved");
+        var gameState = (Game)RuntimeHelpers.GetUninitializedObject(typeof(Game));
+        AccessTools.Field(typeof(Game), "playSettings").SetValue(gameState, new RimWorld.PlaySettings { showWorldFeatures = false });
+        AccessTools.PropertySetter(typeof(Current), "Game").Invoke(null, new object[] { gameState });
+        foreach (WorldFeatureTextMesh label in labels) label.SetActive(false);
+        world.textsCreated = true;
+        var update = AccessTools.Method(typeof(WorldFeatures), "UpdateFeatures");
+        update.Invoke(world, null); update.Invoke(world, null);
+        Check(labels.Count == world.features.Count, "native repeated updates retain consistent text count");
+        // Exercise the actual initial Update failure, before WorldGrid positioning.
+        harmony.Patch(creator, postfix: new HarmonyMethod(throwMethod));
+        world.textsCreated = false;
+        bool firstFailure = false, nextFailure = false;
+        try { update.Invoke(world, null); }
+        catch (TargetInvocationException e) { firstFailure = e.InnerException is InvalidOperationException; }
+        try { update.Invoke(world, null); }
+        catch (TargetInvocationException e) { nextFailure = e.InnerException is InvalidOperationException; }
+        Check(firstFailure && nextFailure && !world.textsCreated, "failed initial updates retry creation without secondary index exception");
+        harmony.Unpatch(creator, throwMethod);
+        world.features = new List<WorldFeature> { new WorldFeature { name = "푸른 산맥" } };
+        creator.Invoke(world, null);
+        Check(((IList)textsField.GetValue(null)).Count == 1, "later valid Korean world recovers after missing-glyph world");
+        var required = (ISet<char>)AccessTools.Field(typeof(Patches), "Characters").GetValue(null);
+        Check(!required.Contains(missingGlyph) && !required.Contains('한'), "new world requirements exclude prior unsupported and supported characters");
+        world.features.Clear(); creator.Invoke(world, null);
+        Check(required.Count == 0 && ((IList)textsField.GetValue(null)).Count == 0, "empty world clears requirements and labels");
         GuiBackend.Current = null; TextMeshProBackend.Current = null;
         imgui.GetMethod("DestroyContext", All).Invoke(null, new[] { context });
     }

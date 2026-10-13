@@ -56,6 +56,19 @@ PASS: atlas rebake preserves old and new syllables
 PASS: newly added syllables generate real geometry after atlas growth
 PASS: unrelated creation exception propagates without suppression
 PASS: Harmony finalizer restores prefab after actual exception
+PASS: real creation failure resets textsCreated
+PASS: real creation failure clears partial text list
 PASS: English retains original world font
 PASS: Korean to English world recreation removes obsolete labels
-PASS: 56 checks; runtime 10.0.10
+PASS: regression fixture is absent from Pretendard
+PASS: missing glyph no longer aborts other world names
+PASS: missing glyph replaced only in rendered name
+PASS: original world feature name preserved
+PASS: replacement glyph generates real visible geometry
+PASS: supplementary scalar replaced once and newline preserved
+PASS: native repeated updates retain consistent text count
+PASS: failed initial updates retry creation without secondary index exception
+PASS: later valid Korean world recovers after missing-glyph world
+PASS: new world requirements exclude prior unsupported and supported characters
+PASS: empty world clears requirements and labels
+PASS: 69 checks; runtime 10.0.10

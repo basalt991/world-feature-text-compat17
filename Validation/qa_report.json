@@ -1,5 +1,5 @@
 {
-  "release": "v0.2.1",
+  "release": "unreleased robustness fix based on v0.2.1",
   "game_version": "1.7.4976 rev1043",
   "runtime_test_platform": "Windows",
   "platforms_implemented": [
@@ -12,13 +12,13 @@
   "xml_valid": true,
   "managed_dll": "AnyCPU / ILOnly; no PInvoke",
   "engine_runtime": "10.0.10 bundled Waylith CLR",
-  "runtime_checks_passed": 56,
+  "runtime_checks_passed": 69,
   "mac_font_paths_simulated": true,
   "actual_apple_fonts_tested": false,
   "mac_runtime_verified": false,
   "in_game_verified": false,
-  "mod_dll_sha256": "77FE8C507FA53E90FDB2789A54F7743A81490ED91A53B25B958231D840BB5DE2",
-  "source_sha256": "BDD89014B95840EB7BA69BE11B5A9344A0D717DE463C91AC341001548B3ECE0C",
+  "mod_dll_sha256": "1C676C898BA01590707CB60DD3AE3EF473F5C1BD9FD71A4CDA429F0872187222",
+  "source_sha256": "A6F024C515D215EDE236A60BD9FA29C9FE156F400A2B22F0E741B9251B85232F",
   "platform_font_source_sha256": "6F21DEEF307BB3EC92F8B7AC5BFCDDB5A447964A7614D3FDDBA7AFF91964A5EF",
   "game_dll_sha256": "A75352BE43FF6FE20A45F014DD0969E90842EE6468C60655D02B9F5138EB69E7",
   "engine_dll_sha256": "7183C5B884BF22DFE9EFA10E596FFAC862EEB3C71678B544C357ED69F50030A3",
@@ -30,5 +30,12 @@
   "bundled_font_sha256": "6D0AF5258997AEC7354A6E340FC2325BA321C410CA48B3AF858C8C3D6E92A324",
   "font_license_sha256": "FB503EBD5FBE8E725380A16201D4F74111756DFE048CA0358CDBED1DA86A9892",
   "bundled_font_hangul_syllables_checked": 11172,
-  "production_font": "bundled Pretendard; no OS font lookup"
+  "production_font": "bundled Pretendard; no OS font lookup",
+  "missing_glyph_regressions_fixed": [
+    "per-label display replacement",
+    "original names preserved",
+    "per-world requirements reset",
+    "failure latch and partial text cleanup",
+    "surrogate-pair replacement"
+  ]
 }

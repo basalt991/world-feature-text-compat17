@@ -25,13 +25,16 @@ namespace WorldFeatureTextCompat17
     {
         private static readonly FieldInfo ForceLegacy = AccessTools.Field(typeof(WorldFeatures), "ForceLegacyText");
         private static readonly FieldInfo LabelText = AccessTools.Field(typeof(WorldFeatureTextMesh_TextMeshPro), "textMesh");
+        private static readonly FieldInfo Texts = AccessTools.Field(typeof(WorldFeatures), "texts");
         private static readonly SortedSet<char> Characters = new SortedSet<char>();
+        private static HashSet<char> supportedCharacters = new HashSet<char>();
         private static MethodInfo bake, bakeRange, getFontBaked, bakeNewFonts, captureAtlas, getIO, getAtlas;
         private static FieldInfo bakedFonts, imFonts, characterList, atlasPixels;
         private static object backend, targetFont;
         private static int fontIndex = -1;
         private static TMP_FontAsset fontAsset;
         private static bool logged;
+        private static bool loggedMissingGlyphs;
         private static string fontPath;
 
         public static void Install(Harmony harmony, string modRoot)
@@ -39,7 +42,7 @@ namespace WorldFeatureTextCompat17
             fontPath = Path.Combine(modRoot, "Fonts", "Pretendard.ttf");
             // These APIs are specific to the Waylith build. Resolve them once, never per frame.
             var type = AccessTools.TypeByName("RimWorldWaylith.Imgui.ImGuiTextMeshProBackend");
-            if (type == null || ForceLegacy == null || LabelText == null) throw new NotSupportedException("World text compatibility requires RimWorld 1.7 Waylith.");
+            if (type == null || ForceLegacy == null || LabelText == null || Texts == null) throw new NotSupportedException("World text compatibility requires RimWorld 1.7 Waylith.");
             bake = AccessTools.Method(type, "Bake");
             bakeRange = AccessTools.Method(type, "BakeRange");
             bakeNewFonts = AccessTools.Method(type, "BakeNewFonts");
@@ -61,6 +64,8 @@ namespace WorldFeatureTextCompat17
                 prefix: new HarmonyMethod(typeof(Patches), nameof(UsePreparedCharacters)));
             harmony.Patch(AccessTools.Method(typeof(WorldFeatureTextMesh_TextMeshPro), "Init"),
                 postfix: new HarmonyMethod(typeof(Patches), nameof(ApplyLabelFont)));
+            harmony.Patch(AccessTools.PropertySetter(typeof(WorldFeatureTextMesh_TextMeshPro), "Text"),
+                prefix: new HarmonyMethod(typeof(Patches), nameof(PrepareLabelText)));
         }
 
         public sealed class PrefabState
@@ -73,6 +78,9 @@ namespace WorldFeatureTextCompat17
         public static void PrepareWorldNames(WorldFeatures __instance, out PrefabState __state)
         {
             __state = null;
+            // Current-world requirements are separate from the native font atlas cache.
+            // Old worlds, including missing glyphs, must not affect a new world's names.
+            Characters.Clear();
             if (__instance.features == null || __instance.features.Count == 0) return;
             // English keeps its native prefab/font, even when loading a formerly Korean world.
             if (LanguageDatabase.activeLanguage == LanguageDatabase.defaultLanguage) return;
@@ -83,17 +91,24 @@ namespace WorldFeatureTextCompat17
             if (!hasHangul) return;
 
             var text = WorldFeatureTextMesh_TextMeshPro.WorldTextPrefab?.GetComponent<TextMeshPro>();
+            __state = new PrefabState { Text = text, Font = text?.font, Legacy = (bool)ForceLegacy.GetValue(null) };
             if (text == null || GuiBackend.Current == null || TextMeshProBackend.Current == null)
                 throw new InvalidOperationException("World text compatibility: world text prefab/font backend is not ready.");
             foreach (var feature in __instance.features)
                 foreach (char c in feature.name ?? "")
                     if (!char.IsControl(c)) Characters.Add(c);
             EnsureFont();
-            var supported = new HashSet<char>(TMP_FontAsset.GetCharacters(fontAsset));
-            foreach (char c in Characters)
-                if (!supported.Contains(c)) throw new InvalidOperationException("World text compatibility: system font lacks U+" + ((int)c).ToString("X4") + ".");
-
-            __state = new PrefabState { Text = text, Font = text.font, Legacy = (bool)ForceLegacy.GetValue(null) };
+            supportedCharacters = new HashSet<char>(TMP_FontAsset.GetCharacters(fontAsset));
+            if (!supportedCharacters.Contains('?'))
+                throw new InvalidDataException("World text compatibility: font lacks the replacement glyph '?'.");
+            if (!loggedMissingGlyphs)
+                foreach (char c in Characters)
+                    if (!supportedCharacters.Contains(c))
+                    {
+                        loggedMissingGlyphs = true;
+                        Log.Warning("[World Feature Text Compatibility 1.7] Some world name characters are absent from Pretendard and will display as '?'. Original world names are preserved.");
+                        break;
+                    }
             // The original coverage checker reads this prefab. Asset clone factories
             // can restore the original font, so ApplyLabelFont also updates each clone.
             text.font = fontAsset;
@@ -105,17 +120,24 @@ namespace WorldFeatureTextCompat17
             }
         }
 
-        public static void RestorePrefab(PrefabState __state)
+        public static void RestorePrefab(WorldFeatures __instance, PrefabState __state, Exception __exception)
         {
             if (__state == null) return;
-            __state.Text.font = __state.Font;
+            if (__state.Text != null) __state.Text.font = __state.Font;
             ForceLegacy.SetValue(null, __state.Legacy);
+            if (__exception == null) return;
+            // UpdateFeatures latches this before creation. A real creation failure must
+            // not leave it true with a partial list, causing a secondary index exception.
+            __instance.textsCreated = false;
+            var texts = (List<WorldFeatureTextMesh>)Texts.GetValue(null);
+            foreach (var label in texts) label.Destroy();
+            texts.Clear();
         }
 
         public static bool UsePreparedCharacters(ref bool __result)
         {
-            // PrepareWorldNames verified all printable characters before swapping the
-            // prefab. Native coverage tests also reject newline/tab control characters.
+            // Printable glyphs have been baked; PrepareLabelText handles missing ones.
+            // Native coverage tests also reject newline/tab control characters.
             var text = WorldFeatureTextMesh_TextMeshPro.WorldTextPrefab?.GetComponent<TextMeshPro>();
             if (fontAsset == null || text == null || !ReferenceEquals(text.font, fontAsset)) return true;
             __result = false;
@@ -133,6 +155,30 @@ namespace WorldFeatureTextCompat17
             // queue on that material as well as on the component's renderer.
             label.fontMaterial.renderQueue = 3610;
             label.GetComponent<UnityEngine.MeshRenderer>().sharedMaterial = label.fontMaterial;
+        }
+
+        public static void PrepareLabelText(WorldFeatureTextMesh_TextMeshPro __instance, ref string value)
+        {
+            var label = (TextMeshPro)LabelText.GetValue(__instance);
+            if (fontAsset == null || label == null || !ReferenceEquals(label.font, fontAsset)) return;
+            value = DisplayText(value, supportedCharacters);
+        }
+
+        public static string DisplayText(string value, ISet<char> supported)
+        {
+            if (string.IsNullOrEmpty(value)) return value;
+            var result = new StringBuilder(value.Length);
+            bool changed = false;
+            for (int i = 0; i < value.Length; i++)
+            {
+                char c = value[i];
+                if (char.IsControl(c) || supported.Contains(c)) { result.Append(c); continue; }
+                // This renderer uses BMP char glyphs. One supplementary Unicode scalar
+                // gets one replacement, not two question marks for its surrogate pair.
+                if (char.IsHighSurrogate(c) && i + 1 < value.Length && char.IsLowSurrogate(value[i + 1])) i++;
+                result.Append('?'); changed = true;
+            }
+            return changed ? result.ToString() : value;
         }
 
         public static bool IsHangul(char c) => (c >= '\uAC00' && c <= '\uD7A3') ||
