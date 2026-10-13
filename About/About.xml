@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
   <name>World Feature Text Compatibility 1.7</name>
-  <author>Local</author>
-  <packageId>local.worldfeaturetextcompat17</packageId>
+  <author>Dead doodle</author>
+  <packageId>DD.worldfeaturetextcompat17</packageId>
   <modVersion IgnoreIfNoMatchingField="true">0.2.2</modVersion>
   <supportedVersions><li>1.7</li></supportedVersions>
   <modDependencies><li><packageId>brrainz.harmony</packageId><displayName>Harmony</displayName><steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl></li></modDependencies>
   <loadAfter><li>brrainz.harmony</li></loadAfter>
-  <description>RimWorld 1.7.4976. Fixes Korean world feature names entering the broken legacy TextMesh path. Prepares the syllables used by world names with the bundled Fonts/Pretendard.ttf font and uses the native TextMeshPro renderer. Keeps world names, positions, wrapping, visibility and language. Pretendard and its license are included; game and Harmony assemblies are not bundled. Readable Fonts 1.7 is optional. Windows isolated engine checks passed; actual macOS execution remains unverified.</description>
+  <description>RimWorld 1.7.4976용 모드입니다. 한글 월드 지형 이름을 표시할 때 오류가 발생하는 구형 TextMesh 경로를 우회합니다. 동봉된 Fonts/Pretendard.ttf 글꼴에서 지형 이름에 필요한 글자를 준비하고, 기존 TextMeshPro 렌더러로 표시합니다.
+지형 이름, 위치, 줄바꿈, 표시 여부와 언어는 유지합니다. Pretendard와 해당 라이선스를 포함하며, 게임 및 Harmony DLL은 포함하지 않습니다.
+Windows에서 독립 엔진 검사를 통과했으나, 실제 macOS 실행은 아직 검증하지 않았습니다.</description>
 </ModMetaData>
