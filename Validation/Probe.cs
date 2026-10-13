@@ -97,7 +97,7 @@ class Probe
         foreach (var method in typeof(Log).GetMethods(All))
             if (method.Name == "Message" || method.Name == "Warning" || method.Name == "Error")
                 harmony.Patch(method, prefix: new HarmonyMethod(typeof(Probe), nameof(MuteLog)));
-        Patches.Install(harmony);
+        Patches.Install(harmony, AppContext.BaseDirectory);
         Check(Harmony.GetPatchInfo(creator).Prefixes.Count > 0, "Harmony patches actual world creator");
         string[] names = { "푸른 산맥", "붉은 강", "ABC 123 해안", "오래된\n숲" };
         foreach (string name in names) world.features.Add(new WorldFeature { name = name });

@@ -2,15 +2,19 @@
   "game_version": "1.7.4976 rev1043",
   "platform": "Windows",
   "build_errors": 0,
-  "build_warnings": 0,
+  "build_warnings": 2,
   "xml_valid": true,
   "engine_runtime": "10.0.10 bundled Waylith CLR",
   "runtime_checks_passed": 41,
   "in_game_verified": false,
   "installed": false,
-  "mod_dll_sha256": "6C5BD930D9525B56833D25152C6531C9C8F87BF5FD079CD66089ABB7605522CF",
-  "source_sha256": "3D8A7CFFD4DE7BF92612099B03B0233966FC3B4000FF192659F5DA4C2DDEBA5D",
+  "mod_dll_sha256": "87FF88669766E87C91921F66920F5698FA5A43305B9E82EC531F9DC9D2295872",
+  "source_sha256": "557E9087D3DFAC7EC22AFDF6683BB3E288E51F80D58DBD4DE237116F7C748201",
   "game_dll_sha256": "A75352BE43FF6FE20A45F014DD0969E90842EE6468C60655D02B9F5138EB69E7",
   "engine_dll_sha256": "7183C5B884BF22DFE9EFA10E596FFAC862EEB3C71678B544C357ED69F50030A3",
-  "unitystubs_sha256": "B0B997C300670D5A42EA70F468FF9FEDABA03CBD65EABF5D522675B3F16CDB22"
+  "unitystubs_sha256": "B0B997C300670D5A42EA70F468FF9FEDABA03CBD65EABF5D522675B3F16CDB22",
+  "font": "Fonts/Pretendard.ttf",
+  "harmony_compile_reference": "Lib.Harmony.Ref 2.4.2",
+  "harmony_runtime": "0Harmony 3.0.0.0 (installed mod)",
+  "build_warning": "NU1900: NuGet vulnerability data endpoint unavailable on final build"
 }

@@ -20,7 +20,7 @@ namespace WorldFeatureTextCompat17
     {
         public CompatibilityMod(ModContentPack content) : base(content)
         {
-            Patches.Install(new Harmony("local.worldfeaturetextcompat17"));
+            Patches.Install(new Harmony("local.worldfeaturetextcompat17"), content.RootDir);
         }
     }
 
@@ -35,9 +35,11 @@ namespace WorldFeatureTextCompat17
         private static int fontIndex = -1;
         private static TMP_FontAsset fontAsset;
         private static bool logged;
+        private static string fontPath;
 
-        public static void Install(Harmony harmony)
+        public static void Install(Harmony harmony, string modRoot)
         {
+            fontPath = Path.Combine(modRoot, "Fonts", "Pretendard.ttf");
             // These APIs are specific to the Waylith build. Resolve them once, never per frame.
             var type = AccessTools.TypeByName("RimWorldWaylith.Imgui.ImGuiTextMeshProBackend");
             if (type == null || ForceLegacy == null || LabelText == null) throw new NotSupportedException("World text compatibility requires RimWorld 1.7 Waylith.");
@@ -145,16 +147,15 @@ namespace WorldFeatureTextCompat17
             var current = TextMeshProBackend.Current;
             if (!ReferenceEquals(backend, current))
             {
-                var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "malgun.ttf");
-                byte[] data = File.ReadAllBytes(path);
+                byte[] data = File.ReadAllBytes(fontPath);
                 string hash = Convert.ToHexString(SHA256.HashData(data));
                 int index = GuiBackend.Current.RegisterFont("WorldFeatureTextCompat17/" + hash + "/48", data, 48f, 1);
-                if (index < 0) throw new InvalidDataException("World text compatibility: Malgun Gothic registration failed.");
+                if (index < 0) throw new InvalidDataException("World text compatibility: Pretendard registration failed.");
                 backend = current;
                 fontIndex = index;
                 // ImGuiHost exposes a List<ImFontPtr> through IReadOnlyList<ImFontPtr>.
                 targetFont = ((IList)imFonts.GetValue(backend))[fontIndex];
-                fontAsset = new TMP_FontAsset(fontIndex) { name = "WorldFeatureTextCompat17/Malgun Gothic" };
+                fontAsset = new TMP_FontAsset(fontIndex) { name = "WorldFeatureTextCompat17/Pretendard" };
             }
             bakeNewFonts.Invoke(backend, null);
             // New worlds may contain new syllables. Rebuild only this dedicated slot.

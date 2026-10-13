@@ -1,6 +1,6 @@
 param(
     [string]$RimWorldDir = 'G:\Steam\steamapps\common\RimWorld',
-    [string]$HarmonyPath = 'G:\Steam\steamapps\workshop\content\294100\2009463077\1.7\Assemblies\0Harmony.dll'
+    [string]$HarmonyPath = ''
 )
 $ErrorActionPreference = 'Stop'
 & dotnet build (Join-Path $PSScriptRoot 'Source\WorldFeatureTextCompat.csproj') -c Release "-p:RimWorldDir=$RimWorldDir" "-p:HarmonyPath=$HarmonyPath" --verbosity quiet
