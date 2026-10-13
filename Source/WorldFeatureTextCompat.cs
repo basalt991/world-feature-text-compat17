@@ -4,15 +4,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
-using System.Runtime.Versioning;
 using System.Text;
 using HarmonyLib;
 using RimWorld.Planet;
 using TMPro;
 using UnityStubs.Gui;
 using Verse;
-
-[assembly: SupportedOSPlatform("windows")]
 
 namespace WorldFeatureTextCompat17
 {
@@ -145,16 +142,16 @@ namespace WorldFeatureTextCompat17
             var current = TextMeshProBackend.Current;
             if (!ReferenceEquals(backend, current))
             {
-                var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "malgun.ttf");
-                byte[] data = File.ReadAllBytes(path);
+                var selected = PlatformFonts.Load(Characters);
+                byte[] data = selected.Data;
                 string hash = Convert.ToHexString(SHA256.HashData(data));
                 int index = GuiBackend.Current.RegisterFont("WorldFeatureTextCompat17/" + hash + "/48", data, 48f, 1);
-                if (index < 0) throw new InvalidDataException("World text compatibility: Malgun Gothic registration failed.");
+                if (index < 0) throw new InvalidDataException("World text compatibility: installed Korean font registration failed.");
                 backend = current;
                 fontIndex = index;
                 // ImGuiHost exposes a List<ImFontPtr> through IReadOnlyList<ImFontPtr>.
                 targetFont = ((IList)imFonts.GetValue(backend))[fontIndex];
-                fontAsset = new TMP_FontAsset(fontIndex) { name = "WorldFeatureTextCompat17/Malgun Gothic" };
+                fontAsset = new TMP_FontAsset(fontIndex) { name = "WorldFeatureTextCompat17/" + selected.Name };
             }
             bakeNewFonts.Invoke(backend, null);
             // New worlds may contain new syllables. Rebuild only this dedicated slot.

@@ -6,5 +6,5 @@
   <supportedVersions><li>1.7</li></supportedVersions>
   <modDependencies><li><packageId>brrainz.harmony</packageId><displayName>Harmony</displayName><steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl></li></modDependencies>
   <loadAfter><li>brrainz.harmony</li></loadAfter>
-  <description>Windows / RimWorld 1.7.4976. Fixes Korean world feature names entering the broken legacy TextMesh path. Prepares the syllables used by world names with the installed Malgun Gothic font and uses the native TextMeshPro renderer. Keeps world names, positions, wrapping, visibility and language. No font files or game assemblies are bundled. Requires C:\Windows\Fonts\malgun.ttf. Readable Fonts 1.7 is optional.</description>
+  <description>RimWorld 1.7.4976. Fixes Korean world feature names entering the broken legacy TextMesh path. Uses installed Korean font data with the native TextMeshPro renderer. Windows: Malgun Gothic. Experimental macOS handling: Apple SD Gothic Neo, AppleGothic or Arial Unicode, with TTC face extraction. Keeps world names, positions, wrapping, visibility and language. No font files or game assemblies are bundled. Readable Fonts 1.7 is optional. Windows isolated engine checks passed; actual Mac execution and in-game visual checks are pending.</description>
 </ModMetaData>

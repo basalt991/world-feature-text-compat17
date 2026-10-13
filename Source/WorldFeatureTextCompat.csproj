@@ -4,6 +4,9 @@
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences><NoStdLib>true</NoStdLib>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo><GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     <AssemblyName>WorldFeatureTextCompat17</AssemblyName><LangVersion>latest</LangVersion><DebugType>none</DebugType>
+    <!-- Windows game reference assemblies mark portable BCL calls as Windows-only.
+         Runtime assemblies are supplied by the game on each OS; none are bundled. -->
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
     <RimWorldDir Condition="'$(RimWorldDir)' == ''">G:\Steam\steamapps\common\RimWorld</RimWorldDir>
     <HarmonyPath Condition="'$(HarmonyPath)' == ''">G:\Steam\steamapps\workshop\content\294100\2009463077\1.7\Assemblies\0Harmony.dll</HarmonyPath>
   </PropertyGroup>
