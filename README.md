@@ -4,24 +4,14 @@ RimWorld **1.7.4976 rev1043**에서 한글 월드 지형 이름을 생성할 때
 
 **설치 파일: [GitHub Releases](https://github.com/basalt991/world-feature-text-compat17/releases)** — v0.2.0부터 Windows/macOS가 같은 ZIP과 모드 DLL을 사용합니다. 시험판이며 실제 플레이 화면 검증은 아직 남아 있습니다.
 
-English: RimWorld 1.7 compatibility patch for Korean world feature names. Uses an installed Korean font and the native TextMeshPro renderer to avoid the broken legacy TextMesh path. Windows uses Malgun Gothic; experimental macOS handling uses Apple SD Gothic Neo or AppleGothic. Requires Harmony; Readable Fonts 1.7 is optional. Game binaries, Harmony and font files are not bundled. Windows isolated engine checks passed; actual macOS execution and in-game visual verification are pending.
-
+English: Windows / RimWorld 1.7 compatibility patch for Korean world feature names. Uses the bundled Pretendard font and the native TextMeshPro renderer to avoid the broken legacy TextMesh path. Requires Harmony; Readable Fonts 1.7 is optional. Game binaries and Harmony are not bundled. Pretendard passed 41 isolated engine checks; in-game visual verification is pending.
 ## 설치
 
 압축파일 안의 `World Feature Text Compatibility 1.7` 폴더를 림월드의 `Mods` 폴더에 넣고, 모드 목록에서 Harmony 다음에 활성화합니다. 언어를 한국어로 설정한 뒤 게임을 재시작하고 월드를 다시 불러오거나 생성합니다.
 
 설치 후 `RimWorld/Mods/World Feature Text Compatibility 1.7/About/About.xml` 경로가 존재해야 합니다.
 
-`Readable Fonts 1.7`과 함께 사용할 수 있으며 해당 모드는 필수 의존성이 아닙니다. 일반 UI 폰트는 바꾸지 않고 월드 지형 이름에만 다음 글꼴을 사용합니다. 글꼴 파일은 배포하지 않습니다.
-
-| 플랫폼 | 월드 이름 글꼴 | 검증 상태 |
-| --- | --- | --- |
-| Windows | 설치된 맑은 고딕(`malgun.ttf`) | 실제 Windows 게임 어셈블리/엔진으로 독립 검증 |
-| macOS | Apple SD Gothic Neo, 이후 AppleGothic / Arial Unicode 순으로 탐색 | 코드와 모의 경로 탐색 검증, Mac 실행 미검증 |
-
-Mac에서는 게임의 엔진 코드에도 명시된 `/System/Library/Fonts/AppleSDGothicNeo.ttc`를 먼저 확인합니다. 없거나 필요한 글자가 빠지면 `/System/Library/Fonts/Supplemental/AppleGothic.ttf`, `/System/Library/Fonts/AppleGothic.ttf`, `/System/Library/Fonts/Supplemental/Arial Unicode.ttf` 순으로 확인합니다. TTC 모음에서는 필요한 글자가 있는 Regular(굵기 400)에 가까운 글꼴을 골라 독립 SFNT 데이터로 추출합니다. 첫 번째 글꼴이 가장 가는 굵기이거나 한글을 지원하지 않아도 첫 번째를 무조건 선택하지 않습니다.
-
-Apple SD Gothic Neo와 AppleGothic은 [Apple의 macOS 글꼴 목록](https://support.apple.com/en-us/120414)에 포함되어 있습니다. 글꼴이 없으면 서체 관리자에서 설치 상태를 확인하세요. Mac에서도 설치 방법은 같습니다. 게임의 로컬 파일 위치에서 `Mods` 폴더에 모드 폴더를 넣고 Harmony 다음에 활성화합니다. 이 환경에는 Mac 게임 파일이나 실행 장치가 없으므로 macOS 버전별 실제 설치 경로와 Apple Silicon/Intel에서의 실행은 확인하지 못했습니다.
+`Readable Fonts 1.7`과 함께 사용할 수 있으며 해당 모드는 필수 의존성이 아닙니다. 월드 지형 이름에는 모드 폴더의 **`Fonts/Pretendard.ttf`**를 사용합니다. 해당 파일과 `Fonts/LICENSE.txt`를 함께 배포하며 시스템 폰트 설치는 필요하지 않습니다.
 
 ## 동작
 
@@ -29,7 +19,7 @@ Apple SD Gothic Neo와 AppleGothic은 [Apple의 macOS 글꼴 목록](https://sup
 
 이 모드는 비영어 환경에서 한글이 포함된 월드 이름이 있을 때만 작동합니다.
 
-- 월드 이름에 실제로 쓰인 문자를 별도 한글 글꼴 슬롯에 준비합니다. 한글 전체를 매번 생성하지 않습니다.
+- 월드 이름에 실제로 쓰인 문자를 별도 Pretendard 글꼴 슬롯에 준비합니다. 한글 전체를 매번 생성하지 않습니다.
 - 글꼴 이미지와 문자 좌표를 엔진의 TextMeshPro에 연결하고, 구형 TextMesh 대신 기존 TextMeshPro 이름 객체를 생성합니다.
 - 각 이름 객체의 글꼴과 월드 표시용 렌더 순서(3610)를 설정합니다.
 - 지형 이름, 월드 데이터, 언어 설정은 바꾸지 않습니다. 위치, 줄바꿈, 구면 배치, 크기와 표시 여부 계산에는 원래 게임 코드를 사용합니다.
@@ -48,8 +38,14 @@ Apple SD Gothic Neo와 AppleGothic은 [Apple의 macOS 글꼴 목록](https://sup
 
 ## 빌드와 재검증
 
-`build.ps1`로 공통 모드 DLL을 빌드합니다. `Validation/run.ps1`은 Windows 전용 검증 실행기이며 검증 DLL 빌드 성공과 어셈블리 이름을 확인한 뒤, 작업 폴더의 임시 런타임 복사본에서 창을 숨긴 독립 검사를 실행합니다. 설치된 게임 파일을 덮어쓰지 않습니다. 게임 DLL, 런타임, Harmony DLL과 폰트는 배포 압축파일에 포함되지 않습니다.
+`build.ps1`로 공통 모드 DLL을 빌드합니다. `Validation/run.ps1`은 Windows 전용 검증 실행기이며 검증 DLL 빌드 성공과 어셈블리 이름을 확인한 뒤, 작업 폴더의 임시 런타임 복사본에서 창을 숨긴 독립 검사를 실행합니다. 검증에도 모드의 `Fonts/Pretendard.ttf`를 복사해 사용합니다. 설치된 게임 파일을 덮어쓰지 않습니다. 게임 DLL, 런타임과 Harmony DLL은 배포 압축파일에 포함되지 않습니다.
 
-기본 게임 경로는 `G:\Steam\steamapps\common\RimWorld`입니다. 다른 경로에서는 `build.ps1` 또는 `Validation/run.ps1`에 `-RimWorldDir`와 `-HarmonyPath`를 지정하세요. .NET 9 SDK 컴파일러로 빌드하고 게임에 포함된 .NET 10 어셈블리를 참조합니다.
+기본 게임 경로는 `G:\Steam\steamapps\common\RimWorld`입니다. 다른 경로에서는 `-RimWorldDir`를 지정하세요. 일반 빌드는 NuGet의 `Lib.Harmony.Ref` 2.4.2를 자동으로 받아 컴파일에만 사용합니다. 설치된 Harmony DLL을 사용하려면 `-HarmonyPath`를 지정할 수 있습니다. `Validation/run.ps1`은 실제 Harmony DLL로 실행하므로 `-HarmonyPath`도 지정해야 합니다. 빌드는 .NET 9 이상 SDK와 게임에 포함된 .NET 10 어셈블리를 사용합니다.
+
+```powershell
+.\build.ps1 -RimWorldDir 'G:\SteamLibrary\steamapps\common\RimWorld'
+```
+
+위 명령은 빌드한 DLL을 `1.7/Assemblies`에 복사합니다. NuGet 참조는 게임 실행용 Harmony 모드를 대체하지 않으므로, 플레이할 때는 Harmony 모드를 설치하고 활성화해야 합니다.
 
 이 모드는 1.7의 내부 글꼴 API를 사용하므로 게임 업데이트로 API가 변경되면 재검증이 필요합니다. 한국어 외 언어 전체를 지원하는 범용 문자 패치는 아닙니다.

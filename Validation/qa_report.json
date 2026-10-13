@@ -7,7 +7,7 @@
     "macOS"
   ],
   "build_errors": 0,
-  "build_warnings": 0,
+  "build_warnings": 2,
   "ca1416_suppressed": "Windows reference assemblies mark portable BCL calls Windows-only",
   "xml_valid": true,
   "managed_dll": "AnyCPU / ILOnly; no PInvoke",
@@ -17,10 +17,14 @@
   "actual_apple_fonts_tested": false,
   "mac_runtime_verified": false,
   "in_game_verified": false,
-  "mod_dll_sha256": "97E38D610ABDC76D3F11ACD2A98BF29F9C05307553F15EB1C716F6EE2265EF17",
-  "source_sha256": "7EBE366C853A3E2400B924CC6C7B554FCABE55BC977EC1AAD667EADE15E17501",
+  "mod_dll_sha256": "77FE8C507FA53E90FDB2789A54F7743A81490ED91A53B25B958231D840BB5DE2",
+  "source_sha256": "BDD89014B95840EB7BA69BE11B5A9344A0D717DE463C91AC341001548B3ECE0C",
   "platform_font_source_sha256": "6F21DEEF307BB3EC92F8B7AC5BFCDDB5A447964A7614D3FDDBA7AFF91964A5EF",
   "game_dll_sha256": "A75352BE43FF6FE20A45F014DD0969E90842EE6468C60655D02B9F5138EB69E7",
   "engine_dll_sha256": "7183C5B884BF22DFE9EFA10E596FFAC862EEB3C71678B544C357ED69F50030A3",
-  "unitystubs_sha256": "B0B997C300670D5A42EA70F468FF9FEDABA03CBD65EABF5D522675B3F16CDB22"
+  "unitystubs_sha256": "B0B997C300670D5A42EA70F468FF9FEDABA03CBD65EABF5D522675B3F16CDB22",
+  "font": "Fonts/Pretendard.ttf",
+  "harmony_compile_reference": "Lib.Harmony.Ref 3.0.0-rc.2",
+  "harmony_runtime": "0Harmony 3.0.0.0 (installed mod)",
+  "build_warning": "NU1900: NuGet vulnerability data endpoint unavailable on final build"
 }

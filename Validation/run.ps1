@@ -14,6 +14,8 @@ $stage = Join-Path (Split-Path -Parent $modRoot) 'tmp\world-text-compat-runtime'
 New-Item -ItemType Directory -Path $stage -Force | Out-Null
 Get-ChildItem -LiteralPath $RimWorldDir -File | Where-Object { $_.Extension -in @('.dll','.exe','.json') } | Copy-Item -Destination $stage -Force
 Copy-Item -LiteralPath (Join-Path $RimWorldDir 'Rendering') -Destination $stage -Recurse -Force
+New-Item -ItemType Directory -Path (Join-Path $stage 'Fonts') -Force | Out-Null
+Copy-Item -LiteralPath (Join-Path $modRoot 'Fonts/Pretendard.ttf') -Destination (Join-Path $stage 'Fonts/Pretendard.ttf') -Force
 Copy-Item -LiteralPath (Join-Path $RimWorldDir 'RimWorld.dll') -Destination (Join-Path $stage 'Engine.dll') -Force
 Copy-Item -LiteralPath $HarmonyPath -Destination $stage -Force
 Copy-Item -LiteralPath (Join-Path $modRoot '1.7\Assemblies\WorldFeatureTextCompat17.dll') -Destination $stage -Force
