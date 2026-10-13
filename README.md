@@ -1,11 +1,10 @@
 # World Feature Text Compatibility 1.7
 
-RimWorld **1.7.4976 rev1043 / Windows**에서 한글 월드 지형 이름을 생성할 때 발생하는 `WorldFeatureTextMesh_Legacy.Init()` 예외를 우회하는 독립 모드입니다. Harmony가 필요합니다.
+RimWorld **1.7.4976 rev1043**에서 한글 월드 지형 이름을 생성할 때 발생하는 `WorldFeatureTextMesh_Legacy.Init()` 예외를 우회하는 독립 모드입니다. Harmony가 필요합니다. Windows에서 독립 엔진 검사를 완료했고 **macOS용 처리도 추가했지만 실제 Mac 실행은 아직 검증하지 않았습니다.**
 
-**설치 파일: [GitHub Releases](https://github.com/basalt991/world-feature-text-compat17/releases)** — ZIP을 내려받아 설치하세요. 첫 배포는 시험판이며 실제 플레이 화면 검증은 아직 남아 있습니다.
+**설치 파일: [GitHub Releases](https://github.com/basalt991/world-feature-text-compat17/releases)** — v0.2.0부터 Windows/macOS가 같은 ZIP과 모드 DLL을 사용합니다. 시험판이며 실제 플레이 화면 검증은 아직 남아 있습니다.
 
 English: Windows / RimWorld 1.7 compatibility patch for Korean world feature names. Uses the bundled Pretendard font and the native TextMeshPro renderer to avoid the broken legacy TextMesh path. Requires Harmony; Readable Fonts 1.7 is optional. Game binaries and Harmony are not bundled. Pretendard passed 41 isolated engine checks; in-game visual verification is pending.
-
 ## 설치
 
 압축파일 안의 `World Feature Text Compatibility 1.7` 폴더를 림월드의 `Mods` 폴더에 넣고, 모드 목록에서 Harmony 다음에 활성화합니다. 언어를 한국어로 설정한 뒤 게임을 재시작하고 월드를 다시 불러오거나 생성합니다.
@@ -29,15 +28,17 @@ English: Windows / RimWorld 1.7 compatibility patch for Korean world feature nam
 
 ## 검증
 
-Pretendard 버전은 NuGet Harmony 참조로 빌드한 배포 DLL을 게임에 포함된 실제 **Waylith CLR 10.0.10**, 설치된 Harmony 3.0, FreeType, ImGui/TextMeshPro와 게임 어셈블리로 불러온 독립 프로세스에서 **41개 검사**를 통과했습니다. 빌드 오류는 0개입니다. 첫 빌드는 경고 0개였으며, 최종 빌드에는 NuGet 취약성 데이터 조회 실패(`NU1900`) 경고 2개가 발생했습니다.
+빌드 오류 0개, 경고 0개. 배포 DLL을 Windows 게임에 포함된 실제 **Waylith CLR 10.0.10**, Harmony 1.7, FreeType, ImGui/TextMeshPro와 게임 어셈블리로 불러온 독립 프로세스에서 **54개 검사**를 통과했습니다. 게임의 Windows 참조 어셈블리가 일반 .NET API에도 Windows 속성을 부여하므로 빌드 시 CA1416 경고를 제외합니다. 배포 DLL에는 플랫폼 전용 속성, P/Invoke 또는 Windows 네이티브 글꼴 API가 없으며 각 플랫폼의 런타임은 게임이 제공합니다.
 
 검사는 `푸른 산맥`, `붉은 강`, `ABC 123 해안`, `오래된\n숲`, `끝없는 협곡`을 사용해 실제 게임의 `CreateOrDestroyTexts()` 실행, 정상 TMP 객체 수, 한글 글자의 메시 생성, 글꼴 이미지 연결, 렌더 순서, 새 글자와 추가 글꼴 등록 후 재생성, 영어 전환, 실제 예외 발생 후 템플릿 복구를 확인합니다.
 
-기록: `Validation/engine_probe.log`, `Validation/qa_report.json`. 검증 프로그램의 월드 이름 템플릿과 복제 팩토리는 독립 프로세스에서 구성했습니다. **실제 게임의 저장 파일을 로드한 월드 화면, 줌/회전, 지형 위 배치와 표시 품질은 아직 검증하지 않았습니다.**
+추가 검사는 Windows 기본 글꼴의 한글 완성형 11,172자, Mac 기본/대체 경로, 글꼴 누락/손상/글자 누락 처리, 한글을 지원하지 않는 첫 글꼴이 있는 TTC의 선택, 추출된 글꼴의 문자 매핑·체크섬과 실제 Waylith/FreeType 등록을 확인합니다. Mac 경로 검사에는 Windows 글꼴 데이터를 대입했고 실제 TTC 검사는 Windows의 바탕 글꼴 모음을 사용했습니다. **Apple 글꼴 파일 자체를 시험한 것은 아닙니다.**
+
+기록: `Validation/engine_probe.log`, `Validation/qa_report.json`. 검증 프로그램의 월드 이름 템플릿과 복제 팩토리는 독립 프로세스에서 구성했습니다. **실제 macOS 엔진 실행, 저장 파일을 로드한 월드 화면, 줌/회전, 지형 위 배치와 표시 품질은 아직 검증하지 않았습니다.**
 
 ## 빌드와 재검증
 
-`build.ps1`로 모드 DLL을 빌드합니다. `Validation/run.ps1`은 검증 DLL 빌드 성공과 어셈블리 이름을 확인한 뒤, 작업 폴더의 임시 런타임 복사본에서 창을 숨긴 독립 검사를 실행합니다. 검증에도 모드의 `Fonts/Pretendard.ttf`를 복사해 사용합니다. 설치된 게임 파일을 덮어쓰지 않습니다. 게임 DLL, 런타임과 Harmony DLL은 배포 압축파일에 포함되지 않습니다.
+`build.ps1`로 공통 모드 DLL을 빌드합니다. `Validation/run.ps1`은 Windows 전용 검증 실행기이며 검증 DLL 빌드 성공과 어셈블리 이름을 확인한 뒤, 작업 폴더의 임시 런타임 복사본에서 창을 숨긴 독립 검사를 실행합니다. 검증에도 모드의 `Fonts/Pretendard.ttf`를 복사해 사용합니다. 설치된 게임 파일을 덮어쓰지 않습니다. 게임 DLL, 런타임과 Harmony DLL은 배포 압축파일에 포함되지 않습니다.
 
 기본 게임 경로는 `G:\Steam\steamapps\common\RimWorld`입니다. 다른 경로에서는 `-RimWorldDir`를 지정하세요. 일반 빌드는 NuGet의 `Lib.Harmony.Ref` 2.4.2를 자동으로 받아 컴파일에만 사용합니다. 설치된 Harmony DLL을 사용하려면 `-HarmonyPath`를 지정할 수 있습니다. `Validation/run.ps1`은 실제 Harmony DLL로 실행하므로 `-HarmonyPath`도 지정해야 합니다. 빌드는 .NET 9 이상 SDK와 게임에 포함된 .NET 10 어셈블리를 사용합니다.
 

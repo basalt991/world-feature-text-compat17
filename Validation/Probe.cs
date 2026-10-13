@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Loader;
@@ -28,6 +29,28 @@ class Probe
     }
     public static bool MuteLog() => false;
     public static void ThrowAfterPreparation() => throw new InvalidOperationException("probe intentional failure");
+    static uint U32(byte[] d, int o) => (uint)d[o] << 24 | (uint)d[o + 1] << 16 | (uint)d[o + 2] << 8 | d[o + 3];
+    static void Put32(byte[] d, int o, uint n) { d[o] = (byte)(n >> 24); d[o + 1] = (byte)(n >> 16); d[o + 2] = (byte)(n >> 8); d[o + 3] = (byte)n; }
+    static byte[] Collection(byte[] latin, byte[] korean)
+    {
+        // Test a collection whose first face cannot draw Korean. Face-local table
+        // offsets become absolute collection offsets, exactly as in a real TTC.
+        int second = 20 + ((latin.Length + 3) & ~3);
+        byte[] data = new byte[second + ((korean.Length + 3) & ~3)];
+        Put32(data, 0, 0x74746366); Put32(data, 4, 0x00010000); Put32(data, 8, 2);
+        Put32(data, 12, 20); Put32(data, 16, (uint)second);
+        foreach (var pair in new[] { (latin, 20), (korean, second) })
+        {
+            Array.Copy(pair.Item1, 0, data, pair.Item2, pair.Item1.Length);
+            int tables = pair.Item1[4] << 8 | pair.Item1[5];
+            for (int i = 0; i < tables; i++)
+            {
+                int r = pair.Item2 + 12 + i * 16 + 8;
+                Put32(data, r, checked(U32(data, r) + (uint)pair.Item2));
+            }
+        }
+        return data;
+    }
     static int Main()
     {
         try
@@ -60,6 +83,39 @@ class Probe
         var register = hostType.GetMethod("RegisterFont", All);
         byte[] latinData = File.ReadAllBytes(@"C:\Windows\Fonts\arial.ttf");
         Check((int)register.Invoke(host, new object[] { "probe/latin", latinData, 48f, 1 }) == 0, "baseline Latin font registration");
+        byte[] koreanData = File.ReadAllBytes(@"C:\Windows\Fonts\malgun.ttf");
+        char[] hangul = Enumerable.Range(0xAC00, 11172).Select(c => (char)c).ToArray();
+        Check(PlatformFonts.SelectFace(koreanData, hangul) == 0, "Windows default covers all 11172 Hangul syllables");
+        var macPaths = PlatformFonts.CandidatePaths(true, "unused-Windows-path");
+        Check(macPaths[0] == "/System/Library/Fonts/AppleSDGothicNeo.ttc" && macPaths.All(p => p.StartsWith("/")), "Mac candidates use engine-confirmed macOS paths");
+        Check(PlatformFonts.CandidatePaths(false, @"C:\Windows\Fonts")[0] == @"C:\Windows\Fonts\malgun.ttf", "Windows candidate remains Malgun Gothic");
+        // Mac path resolution is simulated with installed Windows font data;
+        // these checks do not claim to test Apple fonts or macOS native execution.
+        var macFont = PlatformFonts.Resolve(macPaths, p => p == macPaths[0], p => koreanData, "한글 ABC");
+        Check(macFont.Path == macPaths[0], "simulated Mac primary path resolves");
+        var fallback = PlatformFonts.Resolve(macPaths, p => true,
+            p => p == macPaths[0] ? new byte[12] : p == macPaths[1] ? latinData : koreanData, "한글");
+        Check(fallback.Path == macPaths[2], "corrupt and missing-glyph candidates fall back safely");
+        bool missing = false;
+        try { PlatformFonts.Resolve(macPaths, p => false, p => throw new Exception("must not read absent files"), "한"); }
+        catch (FileNotFoundException) { missing = true; }
+        Check(missing, "missing Mac font produces explicit diagnostic");
+        byte[] collection = Collection(latinData, koreanData);
+        Check(PlatformFonts.SelectFace(collection, "한글 ABC") == 1, "TTC skips Latin-only first face");
+        byte[] extracted = PlatformFonts.ExtractFace(collection, 1);
+        Check(U32(extracted, 0) != 0x74746366 && PlatformFonts.SelectFace(extracted, hangul) == 0, "standalone TTC extraction preserves all Hangul glyph mappings");
+        uint checksum = 0;
+        for (int i = 0; i < extracted.Length; i += 4) checksum = unchecked(checksum + U32(extracted, i));
+        Check(checksum == 0xB1B0AFBA, "extracted SFNT checksum adjustment");
+        bool badIndex = false;
+        try { PlatformFonts.ExtractFace(collection, 2); } catch (InvalidDataException) { badIndex = true; }
+        Check(badIndex, "out-of-range collection face is rejected");
+        int collectionSlot = (int)register.Invoke(host, new object[] { "probe/extracted-collection", extracted, 48f, 1 });
+        Check(collectionSlot >= 0, "real Waylith FreeType accepts extracted TTC face");
+        byte[] batang = File.ReadAllBytes(@"C:\Windows\Fonts\batang.ttc");
+        int batangFace = PlatformFonts.SelectFace(batang, "한글 ABC");
+        Check(batangFace >= 0, "real multi-face Korean TTC selection");
+        Check((int)register.Invoke(host, new object[] { "probe/real-collection", PlatformFonts.ExtractFace(batang, batangFace), 48f, 1 }) >= 0, "real Waylith FreeType accepts extracted real TTC");
         var backendType = game.GetType("RimWorldWaylith.Imgui.ImGuiGuiBackend", true);
         GuiBackend.Current = (IGuiBackend)Activator.CreateInstance(backendType, All, null, new[] { host, null }, null);
         var tmpType = game.GetType("RimWorldWaylith.Imgui.ImGuiTextMeshProBackend", true);

@@ -8,6 +8,9 @@
     <AssemblyName>WorldFeatureTextCompat17</AssemblyName>
     <LangVersion>latest</LangVersion>
     <DebugType>none</DebugType>
+    <!-- Windows game reference assemblies mark portable BCL calls as Windows-only.
+         Runtime assemblies are supplied by the game on each OS; none are bundled. -->
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
     <RimWorldDir Condition="'$(RimWorldDir)' == ''">G:\Steam\steamapps\common\RimWorld</RimWorldDir>
   </PropertyGroup>
   <ItemGroup>

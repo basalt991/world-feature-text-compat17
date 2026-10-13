@@ -1,12 +1,25 @@
 PASS: real FreeType rasterizer
 PASS: baseline Latin font registration
+PASS: Windows default covers all 11172 Hangul syllables
+PASS: Mac candidates use engine-confirmed macOS paths
+PASS: Windows candidate remains Malgun Gothic
+PASS: simulated Mac primary path resolves
+PASS: corrupt and missing-glyph candidates fall back safely
+PASS: missing Mac font produces explicit diagnostic
+PASS: TTC skips Latin-only first face
+PASS: standalone TTC extraction preserves all Hangul glyph mappings
+PASS: extracted SFNT checksum adjustment
+PASS: out-of-range collection face is rejected
+PASS: real Waylith FreeType accepts extracted TTC face
+PASS: real multi-face Korean TTC selection
+PASS: real Waylith FreeType accepts extracted real TTC
 PASS: unpatched world font excludes Hangul
 PASS: Harmony patches actual world creator
 PASS: native creator completes with one label per Korean feature
 PASS: shared prefab restored after creation
 PASS: Korean feature uses native TMP 0
 PASS: asset factory creates independent label 0
-Mesh 0: font=1, visible=4/4
+Mesh 0: font=3, visible=4/4
 PASS: every Korean/Latin glyph generates visible geometry 0
 PASS: real glyph mesh vertex count 0
 PASS: real world font atlas texture 0
@@ -14,7 +27,7 @@ PASS: label material uses captured font pixels 0
 PASS: native world text render queue 0
 PASS: Korean feature uses native TMP 1
 PASS: asset factory creates independent label 1
-Mesh 1: font=1, visible=3/3
+Mesh 1: font=3, visible=3/3
 PASS: every Korean/Latin glyph generates visible geometry 1
 PASS: real glyph mesh vertex count 1
 PASS: real world font atlas texture 1
@@ -22,7 +35,7 @@ PASS: label material uses captured font pixels 1
 PASS: native world text render queue 1
 PASS: Korean feature uses native TMP 2
 PASS: asset factory creates independent label 2
-Mesh 2: font=1, visible=8/8
+Mesh 2: font=3, visible=8/8
 PASS: every Korean/Latin glyph generates visible geometry 2
 PASS: real glyph mesh vertex count 2
 PASS: real world font atlas texture 2
@@ -30,7 +43,7 @@ PASS: label material uses captured font pixels 2
 PASS: native world text render queue 2
 PASS: Korean feature uses native TMP 3
 PASS: asset factory creates independent label 3
-Mesh 3: font=1, visible=4/4
+Mesh 3: font=3, visible=4/4
 PASS: every Korean/Latin glyph generates visible geometry 3
 PASS: real glyph mesh vertex count 3
 PASS: real world font atlas texture 3
@@ -43,4 +56,4 @@ PASS: unrelated creation exception propagates without suppression
 PASS: Harmony finalizer restores prefab after actual exception
 PASS: English retains original world font
 PASS: Korean to English world recreation removes obsolete labels
-PASS: 41 checks; runtime 10.0.10
+PASS: 54 checks; runtime 10.0.10

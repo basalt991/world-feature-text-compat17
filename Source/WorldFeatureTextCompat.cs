@@ -4,15 +4,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
-using System.Runtime.Versioning;
 using System.Text;
 using HarmonyLib;
 using RimWorld.Planet;
 using TMPro;
 using UnityStubs.Gui;
 using Verse;
-
-[assembly: SupportedOSPlatform("windows")]
 
 namespace WorldFeatureTextCompat17
 {
