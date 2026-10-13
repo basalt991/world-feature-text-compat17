@@ -1,12 +1,37 @@
 # World Feature Text Compatibility 1.7
 
-현재 로컬 수정본은 공개 v0.2.1을 기반으로 누락 문자 처리와 월드별 문자 집합 문제를 보완했습니다. Pretendard에 없는 문자는 **화면에만 `?`로 대체**하고 원래 지형 이름은 유지합니다. 다른 월드로 넘어가면 필요 문자 집합을 새로 구성합니다. 이 수정본의 GitHub 릴리스는 아직 게시하지 않았습니다.
+**v0.2.2**는 누락 문자 처리와 월드별 문자 집합 문제를 보완한 버전입니다. Pretendard에 없는 문자는 **화면에만 `?`로 대체**하고 원래 지형 이름은 유지합니다. 다른 월드로 넘어가면 필요 문자 집합을 새로 구성합니다.
 
 RimWorld **1.7.4976 rev1043**에서 한글 월드 지형 이름을 생성할 때 발생하는 `WorldFeatureTextMesh_Legacy.Init()` 예외를 우회하는 독립 모드입니다. Harmony가 필요합니다. Windows에서 독립 엔진 검사를 완료했고 **macOS용 처리도 추가했지만 실제 Mac 실행은 아직 검증하지 않았습니다.**
 
-**설치 파일: [GitHub Releases](https://github.com/basalt991/world-feature-text-compat17/releases)** — **v0.2.1부터 Pretendard가 설치 ZIP에 포함됩니다.** Windows/macOS가 같은 ZIP과 모드 DLL을 사용합니다. 시험판이며 실제 플레이 화면 검증은 아직 남아 있습니다.
+**설치 파일: [v0.2.2 릴리스](https://github.com/basalt991/world-feature-text-compat17/releases/tag/v0.2.2)** — Pretendard와 라이선스가 설치 ZIP에 포함됩니다. Windows/macOS가 같은 ZIP과 모드 DLL을 사용합니다. 시험판이며 실제 플레이 화면 검증은 아직 남아 있습니다.
 
-English: RimWorld 1.7 compatibility patch for Korean world feature names. Uses the bundled Pretendard font and the native TextMeshPro renderer to avoid the broken legacy TextMesh path. Windows isolated engine validation passed; actual macOS execution remains unverified. Requires Harmony; Readable Fonts 1.7 is optional. Game binaries and Harmony are not bundled. This unreleased local fix passed 69 isolated checks. Missing glyphs display as '?' without changing the saved name, and required characters are rebuilt for each world. In-game visual verification is pending.
+English: RimWorld 1.7 compatibility patch for Korean world feature names. Uses the bundled Pretendard font and the native TextMeshPro renderer to avoid the broken legacy TextMesh path. Windows isolated engine validation passed; actual macOS execution remains unverified. Requires Harmony; Readable Fonts 1.7 is optional. Game binaries and Harmony are not bundled. Version 0.2.2 passed 69 isolated checks. Missing glyphs display as '?' without changing the saved name, and required characters are rebuilt for each world. In-game visual verification is pending.
+
+## 패치 내역
+
+### v0.2.2
+
+- Pretendard에 없는 문자 하나 때문에 전체 월드 이름 생성이 중단되는 문제를 수정했습니다. 해당 문자만 화면에서 `?`로 표시하며 원래 지형 이름과 저장 데이터는 유지합니다.
+- 이전 월드의 문자가 전역 집합에 남아 다음 정상 한글 월드도 실패하는 문제를 수정했습니다. 필요 문자 집합을 월드 이름 생성마다 새로 구성합니다.
+- 실제 생성 실패 시 `textsCreated`와 불완전한 텍스트 목록을 복구하여 다음 Update의 연속 인덱스 오류를 막습니다. 원래 예외는 숨기지 않습니다.
+- 보충 평면 문자는 서로게이트 두 개 대신 한 개의 `?`로 대체하고 줄바꿈을 유지합니다.
+- 기존 56개 검사에 위 문제의 회귀 검사를 추가하여 Windows 독립 엔진 검사 **69개**를 통과했습니다. 빌드 오류/경고는 0개입니다.
+
+### v0.2.1
+
+- [PR #1](https://github.com/basalt991/world-feature-text-compat17/pull/1)의 Pretendard 동봉 변경을 반영했습니다. 기여자: craftingmod.
+- 설치 ZIP에 Pretendard-Regular와 라이선스를 포함하고 시스템에 설치된 글꼴에 대한 실행 시 의존성을 제거했습니다.
+- 병합된 코드로 재빌드하고 Windows 독립 엔진 검사 56개를 통과했습니다.
+
+### v0.2.0
+
+- macOS 글꼴 경로 탐색과 TTC 글꼴 모음 처리를 추가했습니다. 이때 도입된 시스템 글꼴 탐색 대신 v0.2.1부터는 동봉된 Pretendard를 사용합니다.
+- 실제 Mac 실행 미검증 상태를 명시하고 Windows 독립 검사 54개를 통과했습니다.
+
+### v0.1.0
+
+- 한글 월드 지형 이름을 기존 TextMeshPro 렌더러로 표시하여 구형 TextMesh 초기화 오류를 우회하는 첫 시험판을 배포했습니다.
 
 ## 설치
 
@@ -34,7 +59,7 @@ English: RimWorld 1.7 compatibility patch for Korean world feature names. Uses t
 
 ## 검증
 
-빌드 오류 0개, 경고 0개. 현재 로컬 수정본 DLL을 Windows 게임에 포함된 실제 **Waylith CLR 10.0.10**, Harmony 1.7, FreeType, ImGui/TextMeshPro와 게임 어셈블리로 불러온 독립 프로세스에서 **69개 검사**를 통과했습니다. 공개 v0.2.1의 기본 56개 검사에 누락 문자 대체, 원래 이름 보존, 서로게이트/줄바꿈, 정상 월드로의 전환, 반복 Update, 예외 시 상태/목록 복구 검사를 추가했습니다. 빌드는 설치된 Harmony DLL을 컴파일 참조로 사용했습니다. 게임의 Windows 참조 어셈블리가 일반 .NET API에도 Windows 속성을 부여하므로 빌드 시 CA1416 경고를 제외합니다. 배포 DLL에는 플랫폼 전용 속성, P/Invoke 또는 Windows 네이티브 글꼴 API가 없으며 각 플랫폼의 런타임은 게임이 제공합니다.
+빌드 오류 0개, 경고 0개. v0.2.2 DLL을 Windows 게임에 포함된 실제 **Waylith CLR 10.0.10**, Harmony 1.7, FreeType, ImGui/TextMeshPro와 게임 어셈블리로 불러온 독립 프로세스에서 **69개 검사**를 통과했습니다. 공개 v0.2.1의 기본 56개 검사에 누락 문자 대체, 원래 이름 보존, 서로게이트/줄바꿈, 정상 월드로의 전환, 반복 Update, 예외 시 상태/목록 복구 검사를 추가했습니다. 빌드는 설치된 Harmony DLL을 컴파일 참조로 사용했습니다. 게임의 Windows 참조 어셈블리가 일반 .NET API에도 Windows 속성을 부여하므로 빌드 시 CA1416 경고를 제외합니다. 배포 DLL에는 플랫폼 전용 속성, P/Invoke 또는 Windows 네이티브 글꼴 API가 없으며 각 플랫폼의 런타임은 게임이 제공합니다.
 
 검사는 `푸른 산맥`, `붉은 강`, `ABC 123 해안`, `오래된\n숲`, `끝없는 협곡`을 사용해 실제 게임의 `CreateOrDestroyTexts()` 실행, 정상 TMP 객체 수, 한글 글자의 메시 생성, 글꼴 이미지 연결, 렌더 순서, 새 글자와 추가 글꼴 등록 후 재생성, 영어 전환, 실제 예외 발생 후 템플릿 복구를 확인합니다.
 

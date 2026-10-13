@@ -1,5 +1,5 @@
 {
-  "release": "unreleased robustness fix based on v0.2.1",
+  "release": "v0.2.2",
   "game_version": "1.7.4976 rev1043",
   "runtime_test_platform": "Windows",
   "platforms_implemented": [
